@@ -1,44 +1,21 @@
 
-// ======================================
-// MQTT CONFIGURATION
-// ======================================
+const SUPABASE_URL = "https://yprravrnfbzmxvuevrhg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_yOySs7YnIgmXrUZQVrtzqg_yD1Ufjlr";
 
-const MQTT_URL = "ws://localhost:9001";
+const TABLE_URL = `${SUPABASE_URL}/rest/v1/sensor_readings`;
 
-const MQTT_TOPIC = "college/temperature/room1";
+const temperatureElement = document.getElementById("temperature");
+const humidityElement = document.getElementById("humidity");
+const statusElement = document.getElementById("connectionStatus");
+const connectionDot = document.getElementById("connectionDot");
+const lastUpdatedElement = document.getElementById("lastUpdated");
 
-// ======================================
-// HTML ELEMENTS
-// ======================================
-
-const temperatureElement =
-    document.getElementById("temperature");
-
-const humidityElement =
-    document.getElementById("humidity");
-
-const statusElement =
-    document.getElementById("connectionStatus");
-
-const connectionDot =
-    document.getElementById("connectionDot");
-
-const lastUpdatedElement =
-    document.getElementById("lastUpdated");
-
-// ======================================
-// TEMPERATURE CHART
-// ======================================
-
-const chartContext =
-    document.getElementById("temperatureChart");
+const chartContext = document.getElementById("temperatureChart");
 
 const temperatureChart = new Chart(chartContext, {
     type: "line",
-
     data: {
         labels: [],
-
         datasets: [{
             label: "Temperature (°C)",
             data: [],
@@ -48,10 +25,8 @@ const temperatureChart = new Chart(chartContext, {
             tension: 0.3
         }]
     },
-
     options: {
         responsive: true,
-
         scales: {
             y: {
                 beginAtZero: false,
@@ -60,7 +35,6 @@ const temperatureChart = new Chart(chartContext, {
                     text: "Temperature (°C)"
                 }
             },
-
             x: {
                 title: {
                     display: true,
@@ -71,120 +45,64 @@ const temperatureChart = new Chart(chartContext, {
     }
 });
 
-// ======================================
-// CONNECT TO MQTT BROKER
-// ======================================
-
-const client = mqtt.connect(MQTT_URL, {
-    clientId: "webDashboard_" +
-        Math.random().toString(16).substring(2, 10),
-
-    connectTimeout: 5000,
-    reconnectPeriod: 3000
-});
-
-// ======================================
-// MQTT CONNECTED
-// ======================================
-
-client.on("connect", function () {
-
-    console.log("MQTT Connected!");
-
-    statusElement.textContent = "MQTT Connected";
-
-    connectionDot.className = "dot connected";
-
-    client.subscribe(MQTT_TOPIC, function (error) {
-
-        if (error) {
-            console.error("Subscription error:", error);
-        } else {
-            console.log("Subscribed to:", MQTT_TOPIC);
-        }
-
-    });
-
-});
-
-// ======================================
-// RECEIVE SENSOR DATA
-// ======================================
-
-client.on("message", function (topic, message) {
-
+async function fetchSensorData() {
     try {
-
-        const data = JSON.parse(message.toString());
-
-        const temperature = Number(data.temperature);
-        const humidity = Number(data.humidity);
-
-        if (!Number.isFinite(temperature) ||
-            !Number.isFinite(humidity)) {
-            throw new Error("Invalid sensor readings");
-        }
-
-        // Update temperature
-        temperatureElement.textContent =
-            temperature.toFixed(1);
-
-        // Update humidity
-        humidityElement.textContent =
-            humidity.toFixed(1);
-
-        // Update last received time
-        const currentTime =
-            new Date().toLocaleTimeString();
-
-        lastUpdatedElement.textContent = currentTime;
-
-        // Add temperature to chart
-        temperatureChart.data.labels.push(currentTime);
-
-        temperatureChart.data.datasets[0].data.push(
-            temperature
+        const response = await fetch(
+            `${TABLE_URL}?select=*&order=created_at.desc&limit=20`,
+            {
+                headers: {
+                    apikey: SUPABASE_KEY,
+                    Authorization: `Bearer ${SUPABASE_KEY}`
+                }
+            }
         );
 
-        // Keep only latest 20 readings
-        if (temperatureChart.data.labels.length > 20) {
-
-            temperatureChart.data.labels.shift();
-
-            temperatureChart.data.datasets[0].data.shift();
-
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
+
+        const records = await response.json();
+
+        if (!records.length) {
+            throw new Error("No sensor readings found.");
+        }
+
+        const latest = records[0];
+
+        temperatureElement.textContent =
+            Number(latest.temperature).toFixed(1);
+
+        humidityElement.textContent =
+            Number(latest.humidity).toFixed(1);
+
+        lastUpdatedElement.textContent =
+            new Date(latest.created_at).toLocaleString();
+
+        // Chart expects oldest-to-newest order
+        const chartRecords = [...records].reverse();
+
+        temperatureChart.data.labels = chartRecords.map(
+            item => new Date(item.created_at).toLocaleTimeString()
+        );
+
+        temperatureChart.data.datasets[0].data =
+            chartRecords.map(item => Number(item.temperature));
 
         temperatureChart.update();
 
-        console.log("Sensor Data:", data);
+        statusElement.textContent = "Supabase Connected";
+        connectionDot.className = "dot connected";
 
     } catch (error) {
+        console.error("Supabase Error:", error);
 
-        console.error("Invalid MQTT message:", error);
-
+        statusElement.textContent = "Database Connection Failed";
+        connectionDot.className = "dot disconnected";
     }
+}
 
-});
+// Initial fetch
+fetchSensorData();
 
-// ======================================
-// MQTT DISCONNECTED
-// ======================================
-
-client.on("close", function () {
-
-    statusElement.textContent = "MQTT Disconnected";
-
-    connectionDot.className = "dot disconnected";
-
-});
-
-// ======================================
-// MQTT ERROR
-// ======================================
-
-client.on("error", function (error) {
-
-    console.error("MQTT Error:", error);
-
-});
+// Refresh readings every 5 seconds
+setInterval(fetchSensorData, 5000);
