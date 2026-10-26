@@ -1,83 +1,113 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Temperature Monitoring</title>
-    <link rel="stylesheet" href="style.css">
 
-    <!-- MQTT.js -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <title>IoT Temperature Monitoring</title>
+
+    <link rel="stylesheet" href="style.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <header>
         <h1>IoT Temperature Monitoring</h1>
-        <p>ESP8266 | DHT11 Sensor | MQTT Protocol</p>
+        <p>ESP8266 | DHT11 Sensor | Supabase Database</p>
     </header>
 
     <main class="container">
 
+        <!-- Database Status -->
         <div class="connection">
             <span id="connectionDot" class="dot"></span>
-            <span id="connectionStatus">Connecting to MQTT...</span>
+            <span id="connectionStatus">Connecting to Supabase...</span>
         </div>
 
+        <!-- Sensor Cards -->
         <section class="cards">
 
             <div class="card temperature-card">
                 <div class="icon">🌡️</div>
+
                 <h2>Temperature</h2>
+
                 <div class="value">
                     <span id="temperature">--</span>
                     <span class="unit">°C</span>
                 </div>
+
                 <p>Live temperature reading</p>
             </div>
 
             <div class="card humidity-card">
                 <div class="icon">💧</div>
+
                 <h2>Humidity</h2>
+
                 <div class="value">
                     <span id="humidity">--</span>
                     <span class="unit">%</span>
                 </div>
+
                 <p>Live humidity reading</p>
             </div>
 
         </section>
 
+        <!-- Temperature Chart -->
         <section class="chart-card">
             <h2>Temperature History</h2>
-            <canvas id="temperatureChart"></canvas>
+
+            <div class="chart-container">
+                <canvas id="temperatureChart"></canvas>
+            </div>
         </section>
 
+        <!-- System Information -->
         <section class="details">
+
             <h2>System Information</h2>
-            <p>MQTT Topic:
-                <strong>college/temperature/room1</strong>
+
+            <p>
+                Database:
+                <strong>Supabase</strong>
             </p>
-            <p>Last Updated:
+
+            <p>
+                Last Updated:
                 <strong id="lastUpdated">Waiting for data...</strong>
             </p>
-            <p>Sensor:
+
+            <p>
+                Sensor:
                 <strong>DHT11</strong>
             </p>
-            <p>Controller:
+
+            <p>
+                Controller:
                 <strong>ESP8266 ESP-12E</strong>
             </p>
+
+            <p>
+                Data Update:
+                <strong>Every 5 seconds</strong>
+            </p>
+
         </section>
 
     </main>
 
     <footer>
-        <p>Temperature Monitoring Using MQTT | IoT Project</p>
+        <p>Temperature Monitoring Using Supabase | IoT Project</p>
     </footer>
 
     <script src="script.js"></script>
+
 </body>
 </html>

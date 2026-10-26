@@ -50,6 +50,7 @@ header p {
     height: 12px;
     border-radius: 50%;
     background: orange;
+    flex-shrink: 0;
 }
 
 .dot.connected {
@@ -87,7 +88,7 @@ header p {
 .value {
     font-size: 48px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin: 25px 0;
 }
 
 .temperature-card .value {
@@ -120,9 +121,10 @@ header p {
     margin-bottom: 20px;
 }
 
-.chart-card canvas {
+.chart-container {
+    position: relative;
     width: 100%;
-    max-height: 350px;
+    height: 350px;
 }
 
 .details p {
@@ -140,6 +142,7 @@ footer {
 }
 
 @media (max-width: 650px) {
+
     .cards {
         grid-template-columns: 1fr;
     }
@@ -150,5 +153,9 @@ footer {
 
     .value {
         font-size: 40px;
+    }
+
+    .chart-container {
+        height: 280px;
     }
 }
