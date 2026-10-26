@@ -1,0 +1,154 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #123c69;
+    color: white;
+    text-align: center;
+    padding: 30px 15px;
+}
+
+header h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #dbeafe;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.connection {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px #0000000d;
+    font-weight: bold;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: orange;
+}
+
+.dot.connected {
+    background: #16a34a;
+}
+
+.dot.disconnected {
+    background: #dc2626;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px #0000000d;
+}
+
+.icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+
+.value {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.temperature-card .value {
+    color: #ea580c;
+}
+
+.humidity-card .value {
+    color: #0284c7;
+}
+
+.unit {
+    font-size: 25px;
+}
+
+.card p {
+    color: #64748b;
+}
+
+.chart-card,
+.details {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px #0000000d;
+}
+
+.chart-card h2,
+.details h2 {
+    margin-bottom: 20px;
+}
+
+.chart-card canvas {
+    width: 100%;
+    max-height: 350px;
+}
+
+.details p {
+    margin: 13px 0;
+    color: #475569;
+    overflow-wrap: anywhere;
+}
+
+footer {
+    background: #123c69;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+@media (max-width: 650px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 23px;
+    }
+
+    .value {
+        font-size: 40px;
+    }
+}
